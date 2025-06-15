@@ -7,15 +7,23 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class UserListCreate(generics.ListCreateAPIView):
+class RegisterCreate(generics.CreateAPIView):
+    serializer_class = UserSerializer
+    
+    def perform_create(self, serializer):
+        try:
+            user = serializer.save()
+            logger.info(f"New user registered: {user.email}")
+        except Exception as e:
+            logger.error(f"Registration failed for {self.request.data.get('email')}: {str(e)}")
+            raise
+
+class UserList(generics.ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return User.objects.filter(id=self.request.user.id)
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
