@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RegisterCreate(generics.CreateAPIView):
     serializer_class = UserSerializer
+    permission_classes = []
     
     def perform_create(self, serializer):
         try:
