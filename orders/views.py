@@ -19,7 +19,8 @@ class OrderListCreate(generics.ListCreateAPIView):
         return queryset
     
     def perform_create(self, serializer):
-        serializer.save()
+        serializer.save(user=self.request.user)
+
         
 
 class OrderRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
