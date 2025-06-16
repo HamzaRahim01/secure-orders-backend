@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .models import User
-from .serializers import UserSerializer
-from .permissions import IsSelf
+from .serializers import UserSerializer, UserEmailSerializer
+from .permissions import IsSelf, IsSuperAdmin
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,12 +19,14 @@ class RegisterCreate(generics.CreateAPIView):
             logger.error(f"Registration failed for {self.request.data.get('email')}: {str(e)}")
             raise
 
+
 class UserList(generics.ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return User.objects.filter(id=self.request.user.id)
+
 
 class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
@@ -43,3 +45,18 @@ class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
             return Response({"detail": "You can only delete your own account."}, status=403)
         self.perform_destroy(instance)
         return Response(status=204)
+    
+
+class UserEmailListView(generics.ListAPIView):
+
+    serializer_class = UserEmailSerializer
+    permission_classes = [permissions.IsAuthenticated, IsSuperAdmin]
+
+    def get_queryset(self):
+        try:
+            users = User.objects.all().values('email')
+            logger.info("Super admin retrieved all user emails.")
+            return users
+        except Exception as e:
+            logger.error(f"Failed to retrieve user emails: {str(e)}")
+            raise    
