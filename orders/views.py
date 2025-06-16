@@ -47,7 +47,7 @@ class OrderByEmailListView(APIView):
             orders = Order.objects.filter(user__in=users).select_related('user')
             serializer = OrderSerializer(orders, many=True)
             logger.info(f"Super admin retrieved {len(orders)} orders for emails: {emails}")
-            return Response(serializer.data, status=status.HTTP200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Failed to retrieve orders by email: {str(e)}")
-            return Response({"detail": "An error occurred."}, status=status.HTTP500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": "An error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
